@@ -11,9 +11,9 @@ export const paymentProvider: PaymentProvider = {
 };
 export const storage: StorageAdapter = {
   resolve(key) {
-    return key === "panorama"
-      ? "/images/novouralsk-night.png"
-      : "/images/city-editorial.png";
+    // Only approved, attributed photos may be resolved. No generated fallback.
+    void key;
+    return "";
   },
   async createUpload() {
     throw new Error("Загрузка отключена до подключения объектного хранилища");

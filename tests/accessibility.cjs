@@ -7,9 +7,10 @@ const { chromium } = require("playwright");
   const page = await browser.newPage({
     viewport: { width: Number(process.env.QA_WIDTH || 390), height: 1000 },
   });
+  if (process.env.QA_THEME === "light") await page.addInitScript(() => localStorage.setItem("novik24.theme", "light"));
   const all = [];
   for (const route of [
-    "feed",
+    "feed", "ads", "shops", "services", "jobs", "online", "parks", "malls",
     "city/medical",
     "city/events",
     "search",

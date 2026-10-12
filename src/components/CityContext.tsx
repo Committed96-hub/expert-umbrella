@@ -1,8 +1,10 @@
+import { ThemeToggle } from "./ThemeToggle";
 import { useEffect, useState } from "react";
 import { Cloud, Clock3, MapPin } from "lucide-react";
-import { useCityContext } from "./CityProvider";
+import { useRemote } from "../commerce/useRemote";
+import type { CityWeather } from "../../shared/weather";
 export function CityContext() {
-  const { data, error, retry } = useCityContext();
+  const { data, error, retry } = useRemote<CityWeather>("/weather");
   const [now, setNow] = useState(Date.now());
   useEffect(() => {
     const timer = setInterval(() => setNow(Date.now()), 30000);
@@ -10,6 +12,7 @@ export function CityContext() {
   }, []);
   return (
     <div className="city-context">
+      <ThemeToggle />
       <span>
         <MapPin size={15} />
         Новоуральск
@@ -23,13 +26,14 @@ export function CityContext() {
         }).format(now)}{" "}
         · Урал
       </span>
-      {data ? (
-        <span>
+      {data?.mode === "live" ? (
+        <span title={`Расчётная погода Open-Meteo · ${data.observedAt}`}>
           <Cloud size={16} />
-          {data.weather.temperature > 0 ? "+" : ""}
-          {data.weather.temperature}° · {data.weather.description} <b>demo</b>
+          {(data.temperature ?? 0) > 0 ? "+" : ""}
+          {data.temperature}° · {data.description} · {data.pressure} мм рт. ст.
+          <a href={data.sourceUrl} target="_blank" rel="noopener noreferrer">Open-Meteo</a>
         </span>
-      ) : error ? (
+      ) : data ? <span>Источник погоды временно недоступен</span> : error ? (
         <button onClick={retry}>Погода недоступна · повторить</button>
       ) : (
         <span>Погода загружается…</span>

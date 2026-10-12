@@ -1,3 +1,6 @@
+import { cityModules } from "./media/modules";
+import { cityWeather } from "./adapters/weather";
+import { photoRegistry } from "./media/registry";
 import { randomUUID } from "node:crypto";
 import { SqliteDatabase } from "./database";
 import { CityService, ApiError } from "./service";
@@ -32,6 +35,9 @@ export async function handleRequest(request: Request): Promise<Response> {
     ).replace(/^\//, "");
     const s = service();
     if (request.method === "GET") {
+      if (route === "weather") return respond(await cityWeather());
+      if (route === "city-modules") return respond(cityModules);
+      if (route === "photos") return respond(photoRegistry);
       if (route === "catalog") return respond(s.catalog(session));
       if (route === "city")
         return respond(s.catalog(session).filter((x) => x.section === "city"));
@@ -45,12 +51,7 @@ export async function handleRequest(request: Request): Promise<Response> {
           city: "Новоуральск",
           timezone: "Asia/Yekaterinburg",
           serverTime: new Date().toISOString(),
-          weather: {
-            mode: "demo",
-            temperature: 7,
-            description: "Облачно",
-            source: "Демонстрационная погода",
-          },
+          weather: { mode: "unavailable", description: "Погода загружается", source: "Open-Meteo", sourceUrl: "https://open-meteo.com/" },
           storage: { mode: "demo", persistent: !process.env.VERCEL },
           monetization,
           media: {

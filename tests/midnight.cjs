@@ -14,7 +14,7 @@ const assert = require("node:assert/strict");
       (process.env.BASE_URL || "http://localhost:4180") + "/#feed",
     );
     await page.locator(".hero h1").waitFor();
-    await page.locator(".hero-panorama").evaluate((img) => img.decode());
+    await page.locator(".hero-panorama .verified-photo figcaption").waitFor();
     assert.equal(await page.locator(".hero-shortcuts button").count(), 7);
     assert.equal(await page.locator(".collection").count(), 8);
     assert.equal(await page.locator(".mobile-nav button").count(), 5);

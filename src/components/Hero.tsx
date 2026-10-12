@@ -1,4 +1,4 @@
-import { useCityContext } from "./CityProvider";
+import { usePhoto, VerifiedPhoto } from "./CityPhotos";
 import { useState } from "react";
 import {
   Search,
@@ -21,7 +21,7 @@ export function Hero({
   onSearch: (query: string) => void;
   onShortcut: (shortcut: Shortcut) => void;
 }) {
-  const { data } = useCityContext();
+  const { photo } = usePhoto("home");
   const [query, setQuery] = useState("");
   const shortcuts = [
     { id: "masters", label: "Мастера", Icon: Wrench },
@@ -34,12 +34,7 @@ export function Hero({
   ] as const;
   return (
     <section className="hero" aria-label="Добро пожаловать в Новик 24">
-      <img
-        className="hero-panorama"
-        src={data?.media.panorama || "/images/novouralsk-night.png"}
-        alt="Художественная панорама города через озеро: вечернее небо и отражения огней"
-        fetchPriority="high"
-      />
+      {photo && <div className="hero-panorama"><VerifiedPhoto photo={photo} priority /></div>}
       <div className="hero-shade" />
       <div className="hero-content">
         <div className="hero-eyebrow">
@@ -106,7 +101,7 @@ export function Hero({
         </div>
       </div>
       <span className="panorama-credit">
-        Художественная визуализация · demo
+        Реальный Новоуральск · без ретуши
       </span>
     </section>
   );

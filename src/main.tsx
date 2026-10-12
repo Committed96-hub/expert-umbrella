@@ -1,3 +1,5 @@
+import { CityModules } from "./components/CityModules";
+import { PhotoProvider, SectionPhoto, PhotoSources } from "./components/CityPhotos";
 import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
@@ -42,6 +44,10 @@ import { CityProvider } from "./components/CityProvider";
 import { CityContext } from "./components/CityContext";
 import { resolveRoute } from "./routes";
 const nav = [
+  { id: "jobs", label: "Работа", Icon: BriefcaseBusiness },
+  { id: "online", label: "Город онлайн", Icon: MapPin },
+  { id: "parks", label: "Парки и отдых", Icon: Leaf },
+  { id: "malls", label: "Торговые центры", Icon: Store },
   { id: "feed", label: "Городская лента", Icon: House },
   { id: "services", label: "Услуги и мастера", Icon: Wrench },
   { id: "ads", label: "Объявления", Icon: ShoppingBag },
@@ -57,6 +63,7 @@ const nav = [
   { id: "pharmacy", label: "Аптеки", Icon: Pill },
 ] as const;
 const titles: Record<Section, string> = {
+  jobs: "Работа в своём городе", online: "Город онлайн", parks: "Время для прогулки", malls: "Торговые центры Новоуральска",
   feed: "Город рядом. Люди рядом.",
   services: "Нужный мастер — рядом",
   ads: "Вещи, возможности, соседи",
@@ -72,6 +79,7 @@ const titles: Record<Section, string> = {
   pharmacy: "Аптеки рядом",
 };
 const subtitles: Record<Section, string> = {
+  jobs: "Проверенные предложения — после подключения источника.", online: "Только разрешённые публичные камеры.", parks: "Реальные парки и аллеи.", malls: "Комсомол и Кедр — будущие подтверждённые карточки.",
   feed: "Всё, чем живёт Новоуральск, в одном месте.",
   services: "Найдите помощь для дома, семьи и повседневных дел.",
   ads: "Покупайте, отдавайте и знакомьтесь с жителями города.",
@@ -387,6 +395,7 @@ function App() {
           </div>
         </aside>
         <main>
+          <SectionPhoto section={section === "city" ? `city/${cityKind}` : section} />
           <div className="page-intro">
             <nav className="section-switcher" aria-label="Все разделы">
               {nav
@@ -481,6 +490,8 @@ function App() {
               "appointments",
             ].includes(section) ? (
             <Commerce section={section} entries={entries} go={go} />
+          ) : ["jobs", "online", "parks", "malls"].includes(section) ? (
+            <CityModules section={section} />
           ) : section === "city" ? (
             <CityHub
               key={cityKind}
@@ -711,6 +722,7 @@ function App() {
               )}
             </>
           )}
+          <PhotoSources />
         </main>
         <aside className="rightbar">
           <div className="city-card">
@@ -1051,7 +1063,7 @@ function App() {
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <CityProvider>
-      <App />
+      <PhotoProvider><App /></PhotoProvider>
     </CityProvider>
   </React.StrictMode>,
 );

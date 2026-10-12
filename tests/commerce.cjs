@@ -18,7 +18,7 @@ const assert = require("node:assert/strict");
     await page.locator(".hero h1").waitFor();
     await page
       .locator(".city-context")
-      .getByText(/Облачно/)
+      .getByText(/мм рт. ст.|Источник погоды временно недоступен/)
       .waitFor();
     await page.goto(base + "/#ads");
     await page.getByRole("button", { name: "Добавить", exact: true }).click();

@@ -10,6 +10,10 @@ export type Section =
   | "cafes"
   | "cart"
   | "bonus"
+  | "jobs"
+  | "online"
+  | "parks"
+  | "malls"
   | "pharmacy"
   | "appointments";
 export type Entry = {

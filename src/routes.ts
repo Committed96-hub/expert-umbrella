@@ -2,6 +2,7 @@ import type { Section } from "./data";
 import { cityKinds, type CityKind } from "./city/source";
 const sections: Section[] = [
   "feed",
+  "jobs", "online", "parks", "malls",
   "services",
   "ads",
   "shops",
