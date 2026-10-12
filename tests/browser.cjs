@@ -30,7 +30,7 @@ const assert = require("node:assert/strict");
     await page.locator(".city-service-card").first().waitFor();
     assert.equal(await page.locator(".city-service-card").count(), 3);
     const loadMs = Date.now() - start;
-    await page.getByRole("checkbox").check();
+    await page.getByRole("checkbox", { name: "Только с окнами · demo" }).check();
     assert.equal(await page.locator(".city-service-card").count(), 2);
     await page.getByLabel("Дата", { exact: true }).fill("2026-10-20");
     assert.equal(await page.locator(".city-service-card").count(), 1);

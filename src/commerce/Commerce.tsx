@@ -51,7 +51,7 @@ export function Commerce({
         )
       : [];
   });
-  const [cafeId, setCafeId] = useState("");
+  const [cafeId, setCafeId] = useState(() => location.hash.split("/")[1] || "");
   const [filter, setFilter] = useState("Все");
   const [query, setQuery] = useState("");
   const [fulfilment, setFulfilment] = useState("pickup");
@@ -67,6 +67,18 @@ export function Commerce({
   );
   const [slot, setSlot] = useState("");
   const orderKey = useRef(crypto.randomUUID());
+  useEffect(() => {
+    const update = () => {
+      if (location.hash.startsWith("#cafes/")) {
+        setCafeId(location.hash.split("/")[1]);
+        setFilter("Все");
+        setQuery("");
+      }
+    };
+    update();
+    window.addEventListener("hashchange", update);
+    return () => window.removeEventListener("hashchange", update);
+  }, []);
   useEffect(() => {
     try {
       localStorage.setItem("novik24.cart.v1", JSON.stringify(cart));
@@ -205,6 +217,14 @@ export function Commerce({
     data.slots.find((x) => x.providerId === provider)?.times || [];
   return (
     <section className="commerce-module">
+      {section === "cafes" && cafe.id === "solo-demo" && (
+        <div className="demo-banner">
+          <b>DEMO-меню, не официальное меню Solo</b>
+          <p>
+            Все блюда, цены и доставка учебные. Заказ не отправится в ресторан.
+          </p>
+        </div>
+      )}
       <div className="commerce-links">
         {[
           { id: "exchange", label: "Биржа" },

@@ -1,5 +1,11 @@
-import { CityModules } from "./components/CityModules";
-import { PhotoProvider, SectionPhoto, PhotoSources } from "./components/CityPhotos";
+import { RealCityProvider, RealCatalog } from "./real/RealCity";
+import { Cinema } from "./experiences/Cinema";
+import { ExchangeDemo } from "./experiences/ExchangeDemo";
+import {
+  PhotoProvider,
+  SectionPhoto,
+  PhotoSources,
+} from "./components/CityPhotos";
 import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
@@ -44,6 +50,8 @@ import { CityProvider } from "./components/CityProvider";
 import { CityContext } from "./components/CityContext";
 import { resolveRoute } from "./routes";
 const nav = [
+  { id: "cinema", label: "Кино и DEMO-билет", Icon: CalendarDays },
+  { id: "cars", label: "Автомобили", Icon: ShoppingBag },
   { id: "jobs", label: "Работа", Icon: BriefcaseBusiness },
   { id: "online", label: "Город онлайн", Icon: MapPin },
   { id: "parks", label: "Парки и отдых", Icon: Leaf },
@@ -63,7 +71,12 @@ const nav = [
   { id: "pharmacy", label: "Аптеки", Icon: Pill },
 ] as const;
 const titles: Record<Section, string> = {
-  jobs: "Работа в своём городе", online: "Город онлайн", parks: "Время для прогулки", malls: "Торговые центры Новоуральска",
+  cinema: "Кино в Новоуральске",
+  cars: "Автомобили наших жителей",
+  jobs: "Работа в своём городе",
+  online: "Город онлайн",
+  parks: "Время для прогулки",
+  malls: "Торговые центры Новоуральска",
   feed: "Город рядом. Люди рядом.",
   services: "Нужный мастер — рядом",
   ads: "Вещи, возможности, соседи",
@@ -79,13 +92,18 @@ const titles: Record<Section, string> = {
   pharmacy: "Аптеки рядом",
 };
 const subtitles: Record<Section, string> = {
-  jobs: "Проверенные предложения — после подключения источника.", online: "Только разрешённые публичные камеры.", parks: "Реальные парки и аллеи.", malls: "Комсомол и Кедр — будущие подтверждённые карточки.",
+  cinema: "Реальный киноцентр и отдельная учебная покупка билета.",
+  cars: "Опубликованные характеристики и ссылки на оригинальные объявления.",
+  jobs: "Опубликованные вакансии с источниками и учебным откликом.",
+  online: "Только разрешённые публичные камеры.",
+  parks: "Реальные парки и аллеи.",
+  malls: "Кедр и Комсомолец — магазины, контакты и источники.",
   feed: "Всё, чем живёт Новоуральск, в одном месте.",
   services: "Найдите помощь для дома, семьи и повседневных дел.",
   ads: "Покупайте, отдавайте и знакомьтесь с жителями города.",
   shops: "Открывайте местные магазины и приятные предложения.",
   search: "Новости, мастера, объявления и магазины.",
-  assistant: "Поможем сориентироваться в демокаталоге Новоуральска.",
+  assistant: "Поиск по карточкам с источниками и отдельным DEMO-примерам.",
   city: "Расписание, адреса, здоровье и досуг в одном пространстве.",
   exchange: "Задания от соседей и демо-отклики.",
   appointments: "Выберите специалиста и демонстрационное время.",
@@ -111,6 +129,18 @@ function App() {
     const v = readStored<unknown>("novik24.saved", []);
     return Array.isArray(v) ? v.filter((x) => typeof x === "string") : [];
   });
+  const [realSavedCount, setRealSavedCount] = useState(() => {
+    const v = readStored<unknown>("novik24.real.saved.v1", []);
+    return Array.isArray(v) ? v.filter((x) => typeof x === "string").length : 0;
+  });
+  useEffect(() => {
+    const update = (event: Event) => {
+      const count = (event as CustomEvent).detail;
+      if (Number.isInteger(count) && count >= 0) setRealSavedCount(count);
+    };
+    window.addEventListener("novik24-real-saved", update);
+    return () => window.removeEventListener("novik24-real-saved", update);
+  }, []);
   const [liked, setLiked] = useState<string[]>([]);
   const [detail, setDetail] = useState<Entry | null>(null);
   const [create, setCreate] = useState(false);
@@ -371,7 +401,7 @@ function App() {
             }}
           >
             <Bookmark size={19} />
-            Избранное <span>{saved.length}</span>
+            Избранное <span>{saved.length + realSavedCount}</span>
           </button>
           <div className="neighbor">
             <div className="neighbor-icon">
@@ -391,11 +421,13 @@ function App() {
             Новоуральск, Свердловская область
             <br />
             Сделано для нашего города <Heart size={12} />
-            <p>Первая версия · Все данные демонстрационные</p>
+            <p>REAL — сведения с источниками · DEMO — учебные сценарии</p>
           </div>
         </aside>
         <main>
-          <SectionPhoto section={section === "city" ? `city/${cityKind}` : section} />
+          <SectionPhoto
+            section={section === "city" ? `city/${cityKind}` : section}
+          />
           <div className="page-intro">
             <nav className="section-switcher" aria-label="Все разделы">
               {nav
@@ -457,6 +489,30 @@ function App() {
               </button>
             ))}
           </nav>
+          {section === "ads" && (
+            <a className="secondary journey-next" href="#cars">
+              Автомобили Новоуральска →
+            </a>
+          )}
+          {section !== "assistant" && (
+            <RealCatalog
+              initialSaved={section === "search" && onlySaved}
+              key={
+                section === "city"
+                  ? `city/${cityKind}`
+                  : `${section}-${onlySaved}`
+              }
+              section={
+                section === "city"
+                  ? `city/${cityKind}`
+                  : section === "cinema"
+                    ? "city/cinema"
+                    : section
+              }
+              query={query}
+            />
+          )}
+          {section === "exchange" && <ExchangeDemo />}
           {section === "feed" && !loading && !error && (
             <HomeCollections
               entries={entries}
@@ -481,6 +537,8 @@ function App() {
                 Повторить загрузку
               </button>
             </div>
+          ) : section === "cinema" ? (
+            <Cinema />
           ) : [
               "exchange",
               "cafes",
@@ -490,9 +548,9 @@ function App() {
               "appointments",
             ].includes(section) ? (
             <Commerce section={section} entries={entries} go={go} />
-          ) : ["jobs", "online", "parks", "malls"].includes(section) ? (
-            <CityModules section={section} />
-          ) : section === "city" ? (
+          ) : ["jobs", "online", "parks", "malls", "cars"].includes(
+              section,
+            ) ? null : section === "city" ? (
             <CityHub
               key={cityKind}
               entries={entries.filter(isCityEntry)}
@@ -506,7 +564,15 @@ function App() {
               saved={saved}
             />
           ) : section === "assistant" ? (
-            <AssistantPanel entries={entries} notify={setToast} />
+            <>
+              <AssistantPanel entries={entries} notify={setToast} />
+              <details className="photo-sources">
+                <summary>
+                  Открыть справочник реальных объектов и источников
+                </summary>
+                <RealCatalog section="assistant" />
+              </details>
+            </>
           ) : (
             <>
               <div className="section-heading">
@@ -1063,7 +1129,11 @@ function App() {
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <CityProvider>
-      <PhotoProvider><App /></PhotoProvider>
+      <PhotoProvider>
+        <RealCityProvider>
+          <App />
+        </RealCityProvider>
+      </PhotoProvider>
     </CityProvider>
   </React.StrictMode>,
 );

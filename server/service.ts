@@ -24,6 +24,16 @@ export class CityService {
   constructor(private db: Database) {
     if (!db.get("catalog")) db.put("catalog", [...demo, ...cityDemo]);
     if (!db.get("commerce")) db.put("commerce", commerceSeed);
+    const commerce = db.get<CommerceCatalog>("commerce")!;
+    if (!commerce.cafes.some((c) => c.id === "solo-demo")) {
+      commerce.cafes.push(
+        ...commerceSeed.cafes.filter((c) => c.id === "solo-demo"),
+      );
+      commerce.menu.push(
+        ...commerceSeed.menu.filter((m) => m.cafeId === "solo-demo"),
+      );
+      db.put("commerce", commerce);
+    }
   }
   catalog(session: string) {
     return [

@@ -1,4 +1,6 @@
 export type Section =
+  | "cinema"
+  | "cars"
   | "feed"
   | "services"
   | "ads"

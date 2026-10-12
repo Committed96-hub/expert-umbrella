@@ -1,19 +1,23 @@
 import { cityModules } from "./media/modules";
 import { cityWeather } from "./adapters/weather";
 import { photoRegistry } from "./media/registry";
+import { ExperienceService } from "./experiences";
+import { curatedCitySource } from "./sources/real-city";
 import { randomUUID } from "node:crypto";
 import { SqliteDatabase } from "./database";
 import { CityService, ApiError } from "./service";
 import { pharmacy, monetization, storage } from "./adapters/integrations";
 let instance: CityService;
+let experience: ExperienceService;
+let database: SqliteDatabase;
 function service() {
   return (instance ||= new CityService(
-    new SqliteDatabase(
+    (database ||= new SqliteDatabase(
       process.env.NOVIK_DB_PATH ||
         (process.env.VERCEL
           ? "/tmp/novik-demo.sqlite"
           : ".data/novik-demo.sqlite"),
-    ),
+    )),
   ));
 }
 export async function handleRequest(request: Request): Promise<Response> {
@@ -34,10 +38,15 @@ export async function handleRequest(request: Request): Promise<Response> {
       url.searchParams.get("route") || url.pathname.replace(/^\/api\//, "")
     ).replace(/^\//, "");
     const s = service();
+    const demos = (experience ||= new ExperienceService(database));
     if (request.method === "GET") {
       if (route === "weather") return respond(await cityWeather());
       if (route === "city-modules") return respond(cityModules);
       if (route === "photos") return respond(photoRegistry);
+      if (route === "real-city") return respond(await curatedCitySource.list());
+      if (route === "experiences") return respond(demos.catalog());
+      if (route === "tickets") return respond(demos.tickets(session));
+      if (route === "exchange-demo") return respond(demos.exchange(session));
       if (route === "catalog") return respond(s.catalog(session));
       if (route === "city")
         return respond(s.catalog(session).filter((x) => x.section === "city"));
@@ -52,7 +61,12 @@ export async function handleRequest(request: Request): Promise<Response> {
           timezone: "Asia/Yekaterinburg",
           links: { community: "https://vk.com/public170182912" },
           serverTime: new Date().toISOString(),
-          weather: { mode: "unavailable", description: "Погода загружается", source: "Open-Meteo", sourceUrl: "https://open-meteo.com/" },
+          weather: {
+            mode: "unavailable",
+            description: "Погода загружается",
+            source: "Open-Meteo",
+            sourceUrl: "https://open-meteo.com/",
+          },
           storage: { mode: "demo", persistent: !process.env.VERCEL },
           monetization,
           media: {
@@ -81,6 +95,11 @@ export async function handleRequest(request: Request): Promise<Response> {
     }
     if (!body || typeof body !== "object" || Array.isArray(body))
       throw new ApiError(400, "Некорректное тело запроса");
+    if (route === "tickets") return respond(demos.ticket(session, body), 201);
+    if (route === "exchange-demo")
+      return respond(demos.updateExchange(session, body));
+    if (route === "job-demo")
+      return respond(demos.jobResponse(session, body), 201);
     if (route === "ads") return respond(s.addAd(session, body), 201);
     if (route === "comments") return respond(s.comment(session, body), 201);
     if (route === "quote") return respond(s.quote(session, body));

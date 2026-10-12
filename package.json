@@ -12,7 +12,8 @@
     "test:midnight": "node tests/midnight.cjs",
     "dev:api": "tsx watch server/local.ts",
     "test:commerce": "node tests/commerce.cjs",
-    "test:photos": "node tests/photos.cjs"
+    "test:photos": "node tests/photos.cjs",
+    "test:real-city": "node tests/real-city.cjs"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",

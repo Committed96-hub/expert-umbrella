@@ -13,3 +13,19 @@ CREATE TABLE pharmacy_offers(id uuid PRIMARY KEY, pharmacy_id uuid NOT NULL, med
 -- Booking/order/bonus updates must share a DB transaction; verify payment webhooks,
 -- reconcile refunds, enforce tenant ownership, moderation and retention before live use.
 CREATE TABLE comments(id uuid PRIMARY KEY, resident_id uuid NOT NULL REFERENCES residents(id), catalog_id uuid NOT NULL REFERENCES catalog(id), text text NOT NULL CHECK(length(text) BETWEEN 1 AND 1000), created_at timestamptz NOT NULL DEFAULT now());
+
+-- Curated source snapshots and demo experience records. Existing live transaction tables are unaffected.
+CREATE TABLE IF NOT EXISTS city_source_snapshots (
+  id TEXT PRIMARY KEY,
+  version TEXT NOT NULL,
+  verified_at TIMESTAMPTZ NOT NULL,
+  payload JSONB NOT NULL
+);
+CREATE TABLE IF NOT EXISTS demo_experience_records (
+  id TEXT PRIMARY KEY,
+  session_id UUID NOT NULL,
+  kind TEXT NOT NULL CHECK (kind IN ('ticket', 'exchange', 'job_draft')),
+  payload JSONB NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS demo_experience_session_idx ON demo_experience_records(session_id, kind);

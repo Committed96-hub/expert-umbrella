@@ -1,3 +1,4 @@
+import { useRealCity } from "../real/RealCity";
 import { useState } from "react";
 import { Sparkles, ArrowUpRight, Send } from "lucide-react";
 import { assistant } from "../repository";
@@ -9,6 +10,7 @@ export function AssistantPanel({
   entries: Entry[];
   notify: (message: string) => void;
 }) {
+  const real = useRealCity();
   const [messages, setMessages] = useState<{ role: string; text: string }[]>(
     [],
   );
@@ -20,7 +22,23 @@ export function AssistantPanel({
     setMessages((m) => [...m, { role: "user", text }]);
     setBusy(true);
     try {
-      const answer = await assistant.reply(text, entries);
+      const words = text
+        .toLocaleLowerCase("ru")
+        .split(/\s+/)
+        .filter((w) => w.length > 2);
+      const matches =
+        real.data?.objects
+          .filter((o) =>
+            words.some((w) =>
+              `${o.title} ${o.category} ${Object.values(o.fields).join(" ")}`
+                .toLocaleLowerCase("ru")
+                .includes(w),
+            ),
+          )
+          .slice(0, 3) || [];
+      const answer = matches.length
+        ? `По реестру источников: ${matches.map((o) => `${o.title}: ${o.fields.Адрес || o.summary} Источник: ${o.sources[0].url}; проверка ${o.verifiedAt}; ${o.status === "partial" ? "часть сведений уточняется" : o.status === "archived" ? "архив" : "подтверждено источником"}`).join("\n\n")} Это поиск по проверяемым карточкам, без языковой модели. Текущие цены и доступность уточняйте у источника.`
+        : await assistant.reply(text, entries);
       setMessages((m) => [...m, { role: "assistant", text: answer }]);
     } catch {
       notify("Не удалось получить ответ");
@@ -38,10 +56,12 @@ export function AssistantPanel({
         <p>
           Задайте вопрос или выберите одну из подсказок.
           <br />
-          Демопомощник подбирает варианты из каталога.
+          Поиск по реальным карточкам с источниками и отдельному демокаталогу.
         </p>
         <div className="suggestions">
           {[
+            "Киноцентр Нейва",
+            "Адрес Solo",
             "Найти мастера по ремонту",
             "Где выпить кофе?",
             "Что отдают бесплатно?",
@@ -85,7 +105,8 @@ export function AssistantPanel({
         </button>
       </form>
       <small className="demo-note">
-        Без подключения к ИИ-модели. Данные и рекомендации демонстрационные.
+        Без подключения к ИИ-модели. REAL-карточки сопровождаются источниками;
+        предложения DEMO не являются реальными.
       </small>
     </div>
   );

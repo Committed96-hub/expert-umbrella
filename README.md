@@ -124,3 +124,21 @@ CHROMIUM_PATH=/usr/bin/chromium BASE_URL=http://localhost:5173 QA_THEME=light no
 Эта версия публикуется из отдельной ветки `preview/verified-novouralsk-photos`; `main` и Production не изменяются.
 
 Кнопка «Подслушано Новоуральск» ведёт во ВКонтакте на сообщество `public170182912`, без импорта публикаций. ID сообщества подтверждён ссылкой на оригинальный пост в материале It’s My City от 12.02.2024: https://itsmycity.net/2024-02-12/vspecshkole-novouralska-pedagog-udaril-uchenicu-sosobennostyami-zdorovya . Доступность VK в этой среде не подтверждена.
+
+## Реальный город и интерактивные демонстрации — этап 4
+
+Реестр объектов и доказательств: `server/sources/real-city.ts`, контракт и интерфейс заменяемого источника `shared/real.ts`, API `GET /api/real-city`. В каждом объекте есть REAL/статус, ссылки, способ и дата проверки, дата сведений, условия использования и статус прав на фото. Фактические карточки отделены от учебных действий. Подробный перечень, источники и оставшиеся ограничения: [REAL_CITY_SOURCES.md](REAL_CITY_SOURCES.md).
+
+Новые маршруты: `#cinema` и `#cars`. Реальные карточки доступны в существующих разделах. Для Solo есть отдельное учебное меню `#cafes/solo-demo`: цены и позиции DEMO, не официальное предложение ресторана.
+
+API демонстраций: `GET /api/experiences`, `GET/POST /api/tickets`, `GET/POST /api/exchange-demo`, `POST /api/job-demo`. Места и цены билетов валидируются сервером; повтор выпуска с тем же ключом не создаёт новый билет. Статус заявки, чат, история билетов и черновик отклика изолированы по demo-сессии. SQLite остаётся серверным хранилищем; для PostgreSQL добавлены таблицы-модели, миграция внешней базы не запускается.
+
+```sh
+npm run build
+npm test
+CHROMIUM_PATH=/usr/bin/chromium BASE_URL=http://localhost:5173 npm run test:real-city
+CHROMIUM_PATH=/usr/bin/chromium BASE_URL=http://localhost:5173 npm run test:browser
+CHROMIUM_PATH=/usr/bin/chromium BASE_URL=http://localhost:5173 npm run test:commerce
+```
+
+Для Vercel используется только ветка `preview/real-city-interactions`. Production и `main` не меняются до проверки пользователем.

@@ -21,7 +21,9 @@ export const photoRegistry: PhotoRegistry = {
   ],
   sections: {
     home: { photoId: "lake" }, feed: { photoId: "square" }, ads: { photoId: "residential" },
-    "city/events": { photoId: "theatre" }, "city/cinema": { missing: "Лицензированное фото кинотеатра ещё не подтверждено" },
+    "city/events": { photoId: "theatre" },
+    cinema: { missing: "Фото киноцентра «Нейва» с подтверждёнными правами пока не найдено" },
+    cars: { missing: "Фотографии продавцов не копируются без разрешения" }, "city/cinema": { missing: "Лицензированное фото кинотеатра ещё не подтверждено" },
     jobs: { missing: "Нужны разрешённые фотографии реальных предприятий" },
     shops: { missing: "Права на фотографии ТЦ «Комсомол» и ТЦ «Кедр» пока не подтверждены" },
     malls: { missing: "Права на фотографии ТЦ «Комсомол» и ТЦ «Кедр» пока не подтверждены" },

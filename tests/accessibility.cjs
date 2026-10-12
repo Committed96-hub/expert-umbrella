@@ -10,7 +10,7 @@ const { chromium } = require("playwright");
   if (process.env.QA_THEME === "light") await page.addInitScript(() => localStorage.setItem("novik24.theme", "light"));
   const all = [];
   for (const route of [
-    "feed", "ads", "shops", "services", "jobs", "online", "parks", "malls",
+    "cinema", "cars", "city/schedule", "city/addresses", "feed", "ads", "shops", "services", "jobs", "online", "parks", "malls",
     "city/medical",
     "city/events",
     "search",

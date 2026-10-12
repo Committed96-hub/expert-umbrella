@@ -2834,3 +2834,59 @@ h1 {
 [data-theme="light"] .verified-photo figcaption a { color:#e9c78b; }
 [data-theme="light"] { --gold: #573912; }
 [data-theme="light"] :is(.theme-toggle,.hero-wordmark > span,.selected,.selected > b,.collection-empty > button,.mobile-nav .active span,.history-row strong) { color: #27384c; }
+.real-panel { margin: 24px 0; padding: 24px; border: 1px solid var(--line); background: var(--surface); border-radius: 22px; }
+.real-panel-title { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; align-items: center; }
+.real-panel-title h2 { font-size: 24px; margin: 10px 0; }
+.real-panel-title > span,.real-intro { color: var(--muted); font-size: 12px; line-height: 1.7; }
+.real-badge { display: inline-flex; align-items: center; gap: 7px; color: var(--blue); font-size: 10px; font-weight: 700; letter-spacing: 1px; }
+.real-toolbar { display: flex; flex-wrap: wrap; gap: 15px; margin: 20px 0 12px; align-items: center; }
+.real-toolbar > label:first-child { display: flex; flex: 1; min-width: 160px; gap: 10px; align-items: center; border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
+.real-toolbar input:not([type="checkbox"]) { background: transparent; border: 0; min-width: 0; width: 100%; color: inherit; }
+.real-check { display: flex; align-items: center; gap: 8px; font-size: 12px; line-height: 1.5; }
+.real-check input { width: 18px; height: 18px; flex-shrink: 0; }
+.real-filters,.real-actions,.choice-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
+.real-filters button,.choice-row > button { padding: 12px 16px; min-height: 44px; border: 1px solid var(--line); border-radius: 12px; color: inherit; }
+.real-filters [aria-pressed="true"],.choice-row [aria-pressed="true"] { border-color: var(--gold); box-shadow: inset 0 0 0 1px var(--gold); }
+.real-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; }
+.real-card { min-width: 0; padding: 20px; border: 1px solid var(--line); border-radius: 16px; }
+.real-card-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.real-card h3 { font-size: 19px; line-height: 1.35; margin: 14px 0; }
+.real-card p,.source-details,.real-details,.real-related { font-size: 13px; line-height: 1.75; overflow-wrap: anywhere; }
+.reliability { display: inline-block; color: var(--blue); font-size: 11px; }
+.reliability-archived { color: var(--gold); }
+.real-details > summary,.source-details > summary,.real-related summary { cursor: pointer; min-height: 44px; padding: 10px 0; color: var(--gold); }
+.real-no-photo { padding: 18px; border: 1px dashed var(--line); border-radius: 12px; color: var(--muted); font-size: 12px; }
+.real-fields { margin: 15px 0; }
+.real-fields > div { display: grid; grid-template-columns: 1fr 1.7fr; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.real-fields dt { color: var(--muted); }.real-fields dd { margin: 0; overflow-wrap: anywhere; }
+.real-actions :is(a,button) { display: inline-flex; gap: 8px; align-items: center; min-height: 44px; font-size: 12px; text-decoration: none; padding: 12px; }
+.source-details a,.real-related a { text-decoration: underline; }
+.job-demo { margin: 20px 0; display: grid; gap: 12px; }
+.job-demo label { display: grid; gap: 8px; font-size: 13px; }
+.job-demo :is(input,textarea) { width: 100%; min-height: 44px; border: 1px solid var(--line); padding: 12px; border-radius: 10px; background: transparent; color: inherit; }
+.job-demo textarea { min-height: 100px; }
+.comparison { max-width: 100%; overflow-x: auto; margin: 24px 0; border: 1px solid var(--line); border-radius: 16px; }
+.comparison table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.comparison :is(th,td) { text-align: left; vertical-align: top; padding: 14px; border-bottom: 1px solid var(--line); min-width: 120px; }
+.comparison caption { text-align: left; padding: 14px; font-size: 14px; font-weight: 700; }
+.experience-module { margin: 24px 0; }
+.experience-card { padding: 24px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); margin: 18px 0; line-height: 1.7; }
+.experience-card h2 { font-size: 24px; margin-top: 0; }
+.experience-steps { display: flex; gap: 8px; flex-wrap: wrap; list-style: none; padding: 0; margin: 24px 0; font-size: 12px; }
+.experience-steps li { padding: 10px; border: 1px solid var(--line); border-radius: 10px; }
+.experience-steps [aria-current] { color: var(--gold); border-color: var(--gold); }
+.experience-card fieldset { border: 1px solid var(--line); border-radius: 12px; padding: 12px; margin-bottom: 16px; }
+.cinema-screen { margin: 24px auto 32px; padding: 12px; width: 85%; border-top: 4px solid var(--blue); border-radius: 50%; text-align: center; font-size: 10px; letter-spacing: 3px; color: var(--blue); }
+.seat-map { max-width: 480px; margin: auto; display: grid; gap: 10px; }
+.seat-row { display: grid; grid-template-columns: 18px repeat(8,minmax(0,1fr)); gap: 6px; align-items: center; }
+.seat-row > span { color: var(--muted); font-size: 11px; }
+.seat-row button { min-height: 38px; border: 1px solid var(--line); border-radius: 7px; font-size: 12px; background: transparent; color: inherit; }
+.seat-row button[aria-pressed="true"] { color: var(--gold); border: 2px solid var(--gold); font-weight: 800; }
+.seat-row button:disabled { opacity: .35; }
+.seat-selection { padding-left: 18px; font-size: 12px; }
+.demo-ticket { border: 2px dashed var(--gold); border-radius: 24px; padding: 28px; background: var(--surface); }
+.demo-ticket h2 { font-size: 30px; }.demo-ticket small { display: block; overflow-wrap: anywhere; color: var(--muted); }
+.ticket-seats { display: flex; flex-wrap: wrap; gap: 16px; padding: 20px 0; border-top: 1px dashed var(--line); border-bottom: 1px dashed var(--line); }
+.ticket-invalid { color: var(--gold); font-size: 20px; font-weight: 800; line-height: 1.5; }
+@media (max-width: 700px) { .real-panel { padding: 16px; } .real-grid { grid-template-columns: 1fr; } .real-card { padding: 16px; } .experience-card { padding: 16px; } .seat-row { gap: 3px; grid-template-columns: 13px repeat(8,minmax(0,1fr)); } .seat-row button { min-height: 32px; padding: 0; } .demo-ticket { padding: 20px; } }
+.choice-row > .primary { color: var(--tone-122039,#122039); }

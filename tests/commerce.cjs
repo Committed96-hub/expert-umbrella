@@ -73,7 +73,7 @@ const assert = require("node:assert/strict");
     await page.locator(".quote").waitFor();
     await page.getByLabel("Бонусные баллы").fill("50");
     await page.locator(".quote").getByText(/530/).waitFor();
-    await page.getByRole("checkbox").check();
+    await page.getByRole("checkbox", { name: "Понимаю, что это демонстрация, заказ не будет исполнен" }).check();
     await page
       .getByRole("button", { name: "Оформить демо-заказ", exact: true })
       .click();
