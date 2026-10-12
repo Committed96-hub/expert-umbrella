@@ -4,7 +4,7 @@ import type { RealSnapshot, RealObject } from "../../shared/real";
 import { useRemote, RemoteState } from "../commerce/useRemote";
 import { readStored } from "../repository";
 import { httpApi } from "../api";
-import { usePhoto, VerifiedPhoto } from "../components/CityPhotos";
+import { usePhotoById, VerifiedPhoto } from "../components/CityPhotos";
 const Context = createContext<ReturnType<
   typeof useRemote<RealSnapshot>
 > | null>(null);
@@ -18,13 +18,7 @@ export function useRealCity() {
   return state;
 }
 function ObjectPhoto({ object }: { object: RealObject }) {
-  const section =
-    object.photoId === "theatre"
-      ? "city/events"
-      : object.photoId === "square"
-        ? "feed"
-        : "";
-  const { photo } = usePhoto(section);
+  const photo = usePhotoById(object.photoId);
   return photo && object.photoStatus === "licensed" ? (
     <VerifiedPhoto photo={photo} />
   ) : (
