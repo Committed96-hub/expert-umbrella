@@ -133,7 +133,7 @@ const assert = require("node:assert/strict");
       await page.goto(
         `${process.env.BASE_URL || "http://localhost:4180"}/#${hash}`,
       );
-      await page.locator("main h1").waitFor();
+      await page.locator(".hero h1, main h1").first().waitFor();
       await page.waitForTimeout(80);
       assert.ok(
         await page.evaluate(

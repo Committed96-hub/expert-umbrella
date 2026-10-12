@@ -1,3 +1,4 @@
+import { EntryVisual } from "../components/EntryVisual";
 import { useMemo, useState } from "react";
 import {
   Bus,
@@ -178,6 +179,13 @@ export function CityHub({
       <div className="catalog-grid">
         {results.map((e) => (
           <article className="card city-service-card" key={e.id}>
+            <button
+              className="art-button"
+              onClick={() => onOpen(e)}
+              aria-label={`Открыть: ${e.title}`}
+            >
+              <EntryVisual entry={e} />
+            </button>
             <div className="card-body">
               <div className="card-tag-row">
                 <span className="tag">{e.category}</span>
@@ -208,6 +216,9 @@ export function CityHub({
                   aria-label={`Подробнее: ${e.title}`}
                   onClick={() => onOpen(e)}
                 >
+                  <span>
+                    {kind === "medical" ? "Посмотреть окна" : "Подробнее"}
+                  </span>
                   <ArrowUpRight size={19} />
                 </button>
               </div>

@@ -4,7 +4,9 @@ const { chromium } = require("playwright");
     executablePath: process.env.CHROMIUM_PATH || undefined,
     args: ["--no-sandbox"],
   });
-  const page = await browser.newPage({ viewport: { width: Number(process.env.QA_WIDTH || 390), height: 1000 } });
+  const page = await browser.newPage({
+    viewport: { width: Number(process.env.QA_WIDTH || 390), height: 1000 },
+  });
   const all = [];
   for (const route of [
     "feed",
@@ -16,8 +18,12 @@ const { chromium } = require("playwright");
     await page.goto(
       (process.env.BASE_URL || "http://localhost:4180") + "/#" + route,
     );
-    await page.locator("main h1").waitFor();
-    await page.waitForTimeout(100);
+    await page.locator(".hero h1, main h1").first().waitFor();
+    await page.evaluate(async () => {
+      await Promise.all(
+        document.getAnimations().map((a) => a.finished.catch(() => {})),
+      );
+    });
     await page.addScriptTag({ path: require.resolve("axe-core/axe.min.js") });
     const result = await page.evaluate(() =>
       axe.run(document, {

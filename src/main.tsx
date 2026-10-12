@@ -20,12 +20,16 @@ import {
   Leaf,
   Bell,
   CalendarDays,
+  UserRound,
+  Grid2X2,
 } from "lucide-react";
 import { type Entry, type Section } from "./data";
 import { repository, readStored, searchEntries, assistant } from "./repository";
 import "./style.css";
 import { AssistantPanel } from "./components/AssistantPanel";
-import { Art } from "./components/Art";
+import { Hero, type Shortcut } from "./components/Hero";
+import { HomeCollections } from "./components/HomeCollections";
+import { EntryVisual } from "./components/EntryVisual";
 import { CityHub, CityDetails } from "./city/CityHub";
 import { isCityEntry, type CityKind } from "./city/source";
 import { resolveRoute } from "./routes";
@@ -188,8 +192,29 @@ function App() {
       (filter === "Все" || x.category === filter) &&
       (!onlySaved || saved.includes(x.id)),
   );
+  function searchCity(value: string) {
+    location.hash = "search";
+    setSection("search");
+    setQuery(value);
+    setFilter("Все");
+    setOnlySaved(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  function shortcut(id: Shortcut) {
+    if (id === "masters") go("services");
+    else if (id === "deals") go("shops");
+    else if (id === "cafes") searchCity("кофе");
+    else if (id === "lost") searchCity("находки");
+    else {
+      const kind =
+        id === "medical" ? "medical" : id === "nearby" ? "addresses" : "events";
+      go("city");
+      setCityKind(kind);
+      location.hash = `city/${kind}`;
+    }
+  }
   return (
-    <>
+    <div className={`app-shell ${section === "feed" ? "home-screen" : ""}`}>
       <header>
         <button
           className="brand"
@@ -199,6 +224,29 @@ function App() {
           новик<span>24</span>
           <i />
         </button>
+        <nav className="desktop-top-nav" aria-label="Разделы">
+          {nav
+            .filter((n) =>
+              ["feed", "services", "shops", "city", "ads"].includes(n.id),
+            )
+            .map(({ id, label }) => (
+              <button
+                key={id}
+                className={section === id ? "active" : ""}
+                onClick={() => go(id)}
+              >
+                {id === "feed"
+                  ? "Главная"
+                  : id === "services"
+                    ? "Мастера"
+                    : id === "shops"
+                      ? "Места и акции"
+                      : id === "city"
+                        ? "Сервисы"
+                        : label}
+              </button>
+            ))}
+        </nav>
         <div className="location">
           <MapPin size={15} /> Новоуральск <span>⌄</span>
         </div>
@@ -241,6 +289,9 @@ function App() {
           Д
         </button>
       </header>
+      {section === "feed" && (
+        <Hero onSearch={searchCity} onShortcut={shortcut} />
+      )}
       <div className="layout">
         <aside className="sidebar">
           <div className="nav-caption">ВАШ ГОРОД</div>
@@ -293,70 +344,47 @@ function App() {
           </div>
         </aside>
         <main>
-          <div className="eyebrow">
-            <span /> НОВОУРАЛЬСК · ДЕМОПЛАТФОРМА
-          </div>
-          <div className="title-row">
-            <div>
-              <h1>{titles[section]}</h1>
-              <p className="subtitle">{subtitles[section]}</p>
-            </div>
-            <button
-              className="primary add-desktop"
-              onClick={() => setCreate(true)}
-            >
-              <Plus size={17} />
-              Добавить
-            </button>
-          </div>
-          {section === "feed" && (
-            <>
-              <button className="city-home-link" onClick={() => go("city")}>
-                <div>
-                  <span>ГОРОД В ОДНОМ ПРИЛОЖЕНИИ · demo</span>
-                  <h2>Планы на день начинаются здесь</h2>
-                  <p>Транспорт, адреса, медицинские талоны, кино и события</p>
-                </div>
-                <ArrowUpRight size={25} />
-              </button>
-              <div className="quick-grid">
-                {[
-                  {
-                    id: "services",
-                    icon: Wrench,
-                    title: "Найти мастера",
-                    text: "Помощь рядом с домом",
-                  },
-                  {
-                    id: "ads",
-                    icon: ShoppingBag,
-                    title: "Объявления",
-                    text: "От соседей — соседям",
-                  },
-                  {
-                    id: "shops",
-                    icon: Store,
-                    title: "Местные магазины",
-                    text: "Свои места и выгодные акции",
-                  },
-                  {
-                    id: "assistant",
-                    icon: Sparkles,
-                    title: "Спросить помощника",
-                    text: "Подскажет, где искать",
-                  },
-                ].map(({ id, icon: Icon, title, text }) => (
-                  <button key={id} onClick={() => go(id as Section)}>
-                    <div className={`quick-icon ${id}`}>
-                      <Icon size={22} />
-                    </div>
-                    <b>{title}</b>
-                    <span>{text}</span>
-                    <ArrowUpRight size={16} className="quick-arrow" />
+          <div className="page-intro">
+            <nav className="section-switcher" aria-label="Все разделы">
+              {nav
+                .filter((n) => n.id !== "feed")
+                .map(({ id, label }) => (
+                  <button
+                    key={id}
+                    className={section === id ? "selected" : ""}
+                    onClick={() => go(id)}
+                  >
+                    {label}
                   </button>
                 ))}
+            </nav>
+            <div className="eyebrow">
+              <span /> НОВОУРАЛЬСК · ДЕМОПЛАТФОРМА
+            </div>
+            <div className="title-row">
+              <div>
+                <h1>{titles[section]}</h1>
+                <p className="subtitle">{subtitles[section]}</p>
               </div>
-            </>
+              <button
+                className="primary add-desktop"
+                onClick={() => setCreate(true)}
+              >
+                <Plus size={17} />
+                Добавить
+              </button>
+            </div>
+          </div>
+          {section === "feed" && !loading && !error && (
+            <HomeCollections
+              entries={entries}
+              onOpen={setDetail}
+              onShortcut={shortcut}
+              onAssistant={() => go("assistant")}
+              onAds={() => go("ads")}
+              saved={saved}
+              onSave={bookmark}
+            />
           )}
           {loading ? (
             <div className="empty" role="status" aria-live="polite">
@@ -470,7 +498,7 @@ function App() {
                             <Bookmark size={18} />
                           </button>
                         </div>
-                        {entry.art && (
+                        {(entry.section !== "feed" || entry.art) && (
                           <button
                             className="art-button"
                             onClick={() => {
@@ -479,7 +507,7 @@ function App() {
                             }}
                             aria-label={`Читать: ${entry.title}`}
                           >
-                            <Art kind={entry.art} large />
+                            <EntryVisual entry={entry} />
                           </button>
                         )}
                         <div className="card-body">
@@ -529,13 +557,13 @@ function App() {
                       </>
                     ) : (
                       <>
-                        {entry.art && (
+                        {(entry.section !== "feed" || entry.art) && (
                           <button
                             className="art-button"
                             onClick={() => setDetail(entry)}
                             aria-label={entry.title}
                           >
-                            <Art kind={entry.art} />
+                            <EntryVisual entry={entry} />
                           </button>
                         )}
                         <div className="card-body">
@@ -572,6 +600,7 @@ function App() {
                               aria-label={`Подробнее: ${entry.title}`}
                               onClick={() => setDetail(entry)}
                             >
+                              <span>Подробнее</span>
                               <ArrowUpRight size={19} />
                             </button>
                           </div>
@@ -681,32 +710,57 @@ function App() {
         </aside>
       </div>
       <nav className="mobile-nav" aria-label="Мобильная навигация">
-        {nav
-          .filter((n) => n.id !== "assistant")
-          .map(({ id, Icon, label }) => (
-            <button
-              key={id}
-              className={section === id ? "active" : ""}
-              onClick={() => go(id)}
-              aria-label={label}
-              aria-current={section === id ? "page" : undefined}
-            >
-              <Icon size={21} />
-              <span>
-                {id === "feed"
-                  ? "Лента"
-                  : id === "services"
-                    ? "Услуги"
-                    : id === "shops"
-                      ? "Магазины"
-                      : id === "search"
-                        ? "Поиск"
-                        : id === "city"
-                          ? "Город"
-                          : "Объявления"}
-              </span>
-            </button>
-          ))}
+        {[
+          {
+            id: "feed",
+            label: "Главная",
+            Icon: House,
+            action: () => go("feed"),
+          },
+          {
+            id: "search",
+            label: "Поиск",
+            Icon: Search,
+            action: () => go("search"),
+          },
+          {
+            id: "nearby",
+            label: "Рядом",
+            Icon: MapPin,
+            action: () => shortcut("nearby"),
+          },
+          {
+            id: "city",
+            label: "Сервисы",
+            Icon: Grid2X2,
+            action: () => go("city"),
+          },
+          {
+            id: "profile",
+            label: "Профиль",
+            Icon: UserRound,
+            action: () =>
+              setToast("Вы в деморежиме. Авторизация — следующий этап."),
+          },
+        ].map(({ id, label, Icon, action }) => (
+          <button
+            key={id}
+            className={
+              (section === id &&
+                !(id === "city" && cityKind === "addresses")) ||
+              (id === "nearby" &&
+                section === "city" &&
+                cityKind === "addresses")
+                ? "active"
+                : ""
+            }
+            onClick={action}
+            aria-label={label}
+          >
+            <Icon size={21} />
+            <span>{label}</span>
+          </button>
+        ))}
       </nav>
       {toast && (
         <div className="toast" role="status">
@@ -826,7 +880,7 @@ function App() {
                   <p className="detail-meta">
                     {detail.author} · {detail.meta}
                   </p>
-                  {detail.art && <Art kind={detail.art} />}
+                  {<EntryVisual entry={detail} />}
                   <p>{detail.text}</p>
                   {isCityEntry(detail) && <CityDetails entry={detail} />}{" "}
                   {detail.price && <h3>{detail.price}</h3>}
@@ -897,7 +951,7 @@ function App() {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
 createRoot(document.getElementById("root")!).render(
