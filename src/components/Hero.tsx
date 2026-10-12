@@ -1,3 +1,4 @@
+import { useCityContext } from "./CityProvider";
 import { useState } from "react";
 import {
   Search,
@@ -20,6 +21,7 @@ export function Hero({
   onSearch: (query: string) => void;
   onShortcut: (shortcut: Shortcut) => void;
 }) {
+  const { data } = useCityContext();
   const [query, setQuery] = useState("");
   const shortcuts = [
     { id: "masters", label: "Мастера", Icon: Wrench },
@@ -34,7 +36,7 @@ export function Hero({
     <section className="hero" aria-label="Добро пожаловать в Новик 24">
       <img
         className="hero-panorama"
-        src="/images/novouralsk-night.png"
+        src={data?.media.panorama || "/images/novouralsk-night.png"}
         alt="Художественная панорама города через озеро: вечернее небо и отражения огней"
         fetchPriority="high"
       />

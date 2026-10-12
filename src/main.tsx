@@ -22,6 +22,10 @@ import {
   CalendarDays,
   UserRound,
   Grid2X2,
+  UtensilsCrossed,
+  BriefcaseBusiness,
+  Gift,
+  Pill,
 } from "lucide-react";
 import { type Entry, type Section } from "./data";
 import { repository, readStored, searchEntries, assistant } from "./repository";
@@ -32,6 +36,10 @@ import { HomeCollections } from "./components/HomeCollections";
 import { EntryVisual } from "./components/EntryVisual";
 import { CityHub, CityDetails } from "./city/CityHub";
 import { isCityEntry, type CityKind } from "./city/source";
+import { Commerce } from "./commerce/Commerce";
+import { httpApi } from "./api";
+import { CityProvider } from "./components/CityProvider";
+import { CityContext } from "./components/CityContext";
 import { resolveRoute } from "./routes";
 const nav = [
   { id: "feed", label: "Городская лента", Icon: House },
@@ -41,6 +49,12 @@ const nav = [
   { id: "city", label: "Городские сервисы", Icon: CalendarDays },
   { id: "search", label: "Городской поиск", Icon: Search },
   { id: "assistant", label: "ИИ-помощник", Icon: Sparkles },
+  { id: "exchange", label: "Биржа", Icon: BriefcaseBusiness },
+  { id: "appointments", label: "Услуги и запись", Icon: CalendarDays },
+  { id: "cafes", label: "Кафе и меню", Icon: UtensilsCrossed },
+  { id: "cart", label: "Корзина", Icon: ShoppingBag },
+  { id: "bonus", label: "Новик Бонус", Icon: Gift },
+  { id: "pharmacy", label: "Аптеки", Icon: Pill },
 ] as const;
 const titles: Record<Section, string> = {
   feed: "Город рядом. Люди рядом.",
@@ -50,6 +64,12 @@ const titles: Record<Section, string> = {
   search: "Весь город в одном поиске",
   assistant: "Спросите о городе",
   city: "Ваш город — под рукой",
+  exchange: "Биржа городских дел",
+  appointments: "Время для ваших планов",
+  cafes: "Любимые вкусы рядом",
+  cart: "Ваша корзина",
+  bonus: "Новик Бонус",
+  pharmacy: "Аптеки рядом",
 };
 const subtitles: Record<Section, string> = {
   feed: "Всё, чем живёт Новоуральск, в одном месте.",
@@ -59,6 +79,12 @@ const subtitles: Record<Section, string> = {
   search: "Новости, мастера, объявления и магазины.",
   assistant: "Поможем сориентироваться в демокаталоге Новоуральска.",
   city: "Расписание, адреса, здоровье и досуг в одном пространстве.",
+  exchange: "Задания от соседей и демо-отклики.",
+  appointments: "Выберите специалиста и демонстрационное время.",
+  cafes: "Кафе, меню и демо-заказ без оплаты.",
+  cart: "Проверьте demo-заказ — он не отправляется в кафе.",
+  bonus: "Будущая программа привилегий. Все баллы demo.",
+  pharmacy: "Будущий модуль. Реальная продажа лекарств отключена.",
 };
 
 function App() {
@@ -84,25 +110,39 @@ function App() {
   const [onlySaved, setOnlySaved] = useState(
     () => resolveRoute(location.hash).saved,
   );
-  const [comments, setComments] = useState<Record<string, string[]>>(() => {
-    const value = readStored<unknown>("novik24.comments", {});
-    return value && typeof value === "object" && !Array.isArray(value)
-      ? Object.fromEntries(
-          Object.entries(value)
-            .filter(([, v]) => Array.isArray(v))
-            .map(([k, v]) => [
-              k,
-              (v as unknown[]).filter((x) => typeof x === "string"),
-            ]),
-        )
-      : {};
-  });
+  const [comments, setComments] = useState<Record<string, string[]>>({});
   const [comment, setComment] = useState("");
   async function load() {
     setLoading(true);
     setError("");
     try {
-      setEntries(await repository.list());
+      const loaded = await repository.list();
+      setEntries(loaded);
+      const oldComments = readStored<Record<string, string[]>>(
+        "novik24.comments",
+        {},
+      );
+      if (
+        oldComments &&
+        typeof oldComments === "object" &&
+        !Array.isArray(oldComments)
+      ) {
+        for (const [entryId, texts] of Object.entries(oldComments)) {
+          if (Array.isArray(texts) && loaded.some((e) => e.id === entryId)) {
+            for (const [index, text] of texts.entries())
+              if (typeof text === "string" && text.trim())
+                await httpApi.request("/comments", {
+                  entryId,
+                  text,
+                  legacyId: `${entryId}-${index}`,
+                });
+          }
+        }
+        try {
+          localStorage.removeItem("novik24.comments");
+        } catch {}
+      }
+      setComments(await httpApi.request<Record<string, string[]>>("/comments"));
     } catch {
       setError("Не удалось загрузить каталог. Попробуйте ещё раз.");
     } finally {
@@ -203,7 +243,7 @@ function App() {
   function shortcut(id: Shortcut) {
     if (id === "masters") go("services");
     else if (id === "deals") go("shops");
-    else if (id === "cafes") searchCity("кофе");
+    else if (id === "cafes") go("cafes");
     else if (id === "lost") searchCity("находки");
     else {
       const kind =
@@ -214,7 +254,9 @@ function App() {
     }
   }
   return (
-    <div className={`app-shell ${section === "feed" ? "home-screen" : ""}`}>
+    <div
+      className={`app-shell ${section === "feed" ? "home-screen" : ""} ${["exchange", "appointments", "cafes", "cart", "bonus", "pharmacy"].includes(section) ? "commerce-screen" : ""}`}
+    >
       <header>
         <button
           className="brand"
@@ -289,6 +331,7 @@ function App() {
           Д
         </button>
       </header>
+      <CityContext />
       {section === "feed" && (
         <Hero onSearch={searchCity} onShortcut={shortcut} />
       )}
@@ -347,7 +390,18 @@ function App() {
           <div className="page-intro">
             <nav className="section-switcher" aria-label="Все разделы">
               {nav
-                .filter((n) => n.id !== "feed")
+                .filter(
+                  (n) =>
+                    n.id !== "feed" &&
+                    ![
+                      "exchange",
+                      "appointments",
+                      "cafes",
+                      "cart",
+                      "bonus",
+                      "pharmacy",
+                    ].includes(n.id),
+                )
                 .map(({ id, label }) => (
                   <button
                     key={id}
@@ -375,6 +429,25 @@ function App() {
               </button>
             </div>
           </div>
+          <nav className="journey-nav" aria-label="Городской путь">
+            {[
+              { id: "feed", label: "Город" },
+              { id: "ads", label: "Объявления" },
+              { id: "exchange", label: "Биржа" },
+              { id: "appointments", label: "Услуги и запись" },
+              { id: "cafes", label: "Кафе и меню" },
+              { id: "cart", label: "Корзина" },
+              { id: "bonus", label: "Новик Бонус" },
+            ].map((x) => (
+              <button
+                key={x.id}
+                className={section === x.id ? "selected" : ""}
+                onClick={() => go(x.id as Section)}
+              >
+                {x.label}
+              </button>
+            ))}
+          </nav>
           {section === "feed" && !loading && !error && (
             <HomeCollections
               entries={entries}
@@ -399,6 +472,15 @@ function App() {
                 Повторить загрузку
               </button>
             </div>
+          ) : [
+              "exchange",
+              "cafes",
+              "cart",
+              "bonus",
+              "pharmacy",
+              "appointments",
+            ].includes(section) ? (
+            <Commerce section={section} entries={entries} go={go} />
           ) : section === "city" ? (
             <CityHub
               key={cityKind}
@@ -797,7 +879,9 @@ function App() {
               <>
                 <span className="tag">От соседей — соседям</span>
                 <h2 id="modal-title">Добавить объявление</h2>
-                <p>Объявление сохранится в этом браузере.</p>
+                <p>
+                  Демо-объявление сохранится на сервере для вашей демосессии.
+                </p>
                 <form
                   className="create-form"
                   onSubmit={async (e) => {
@@ -820,10 +904,10 @@ function App() {
                       setEntries((v) => [entry, ...v]);
                       setCreate(false);
                       go("ads");
-                      setToast("Объявление добавлено в этом браузере");
+                      setToast("Объявление добавлено на демо-сервер");
                     } catch {
                       setToast(
-                        "Не удалось сохранить. Проверьте доступ к хранилищу браузера.",
+                        "Не удалось сохранить объявление на сервере. Повторите запрос.",
                       );
                     }
                   }}
@@ -882,6 +966,18 @@ function App() {
                   </p>
                   {<EntryVisual entry={detail} />}
                   <p>{detail.text}</p>
+                  {detail.section === "services" && (
+                    <button
+                      className="primary journey-next"
+                      onClick={() => {
+                        setDetail(null);
+                        go("appointments");
+                        location.hash = `appointments/${detail.id}`;
+                      }}
+                    >
+                      Выбрать demo-время
+                    </button>
+                  )}
                   {isCityEntry(detail) && <CityDetails entry={detail} />}{" "}
                   {detail.price && <h3>{detail.price}</h3>}
                   <p className="demo-note">
@@ -906,25 +1002,23 @@ function App() {
                         </p>
                       ))}
                       <form
-                        onSubmit={(e) => {
+                        onSubmit={async (e) => {
                           e.preventDefault();
                           if (!comment.trim()) return;
-                          const next = {
-                            ...comments,
-                            [detail.id]: [
-                              ...(comments[detail.id] || []),
-                              comment.trim(),
-                            ],
-                          };
                           try {
-                            localStorage.setItem(
-                              "novik24.comments",
-                              JSON.stringify(next),
+                            setComments(
+                              await httpApi.request<Record<string, string[]>>(
+                                "/comments",
+                                { entryId: detail.id, text: comment.trim() },
+                              ),
                             );
-                            setComments(next);
                             setComment("");
-                          } catch {
-                            setToast("Не удалось сохранить комментарий");
+                          } catch (error) {
+                            setToast(
+                              error instanceof Error
+                                ? error.message
+                                : "Не удалось сохранить комментарий",
+                            );
                           }
                         }}
                       >
@@ -956,6 +1050,8 @@ function App() {
 }
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <App />
+    <CityProvider>
+      <App />
+    </CityProvider>
   </React.StrictMode>,
 );

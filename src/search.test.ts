@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { demo } from "./data";
+import { demo } from "../server/seed/catalog";
 import { searchEntries, assistant } from "./repository";
 test("Поиск учитывает русский регистр и несколько слов", () => {
   assert.equal(searchEntries(demo, "  МАСТЕР дому ")[0].id, "s1");

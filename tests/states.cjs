@@ -1,4 +1,3 @@
-// Fault injection happens only in the test browser's downloaded asset.
 const { chromium } = require("playwright");
 const assert = require("node:assert/strict");
 (async () => {
@@ -7,25 +6,16 @@ const assert = require("node:assert/strict");
     args: ["--no-sandbox"],
   });
   const page = await browser.newPage();
-  await page.addInitScript(() => {
-    let calls = 0;
-    window.__qaSource = async (data) => {
+  let calls = 0;
+  await page.route("**/api/catalog", async (route) => {
+    if (calls++ === 0) {
       await new Promise((r) => setTimeout(r, 300));
-      if (calls++ === 0) throw new Error("Simulated source failure");
-      return structuredClone(data);
-    };
-  });
-  await page.route("**/assets/*.js", async (route) => {
-    const response = await route.fetch();
-    const text = await response.text();
-    assert.match(text, /structuredClone\(\w+\)/);
-    await route.fulfill({
-      response,
-      body: text.replace(
-        /structuredClone\((\w+)\)/,
-        "await window.__qaSource($1)",
-      ),
-    });
+      await route.fulfill({
+        status: 503,
+        contentType: "application/json",
+        body: '{"error":"Тестовая ошибка источника"}',
+      });
+    } else await route.continue();
   });
   await page.goto(
     (process.env.BASE_URL || "http://localhost:4180") + "/#city/medical",
@@ -36,7 +26,7 @@ const assert = require("node:assert/strict");
   await page.locator(".city-service-card").first().waitFor();
   assert.equal(await page.locator(".city-service-card").count(), 3);
   assert.equal(await page.getByRole("alert").count(), 0);
-  console.log("Loading, source error and successful retry: passed");
+  console.log("HTTP API loading/error/retry: passed");
   await browser.close();
 })().catch((e) => {
   console.error(e);

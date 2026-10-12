@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { cityDemo, demoCitySource, cityKinds } from "./city/source";
+import { cityDemo, demoCitySource } from "../server/seed/city";
+import { cityKinds } from "./city/source";
 import { createRepository, searchEntries } from "./repository";
 import { resolveRoute } from "./routes";
 test("Все городские разделы содержат явный demo-источник", () => {
@@ -26,8 +27,8 @@ test("Замена источника не меняет контракт реп�
     },
   };
   const entries = await createRepository({
-    async list() {
-      return [live];
+    async request<T>() {
+      return [live] as T;
     },
   }).list();
   assert.equal(entries.filter((x) => x.section === "city").length, 1);

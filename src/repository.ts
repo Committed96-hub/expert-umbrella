@@ -1,12 +1,11 @@
-import { demo, type Entry } from "./data";
-import { demoCitySource, type CitySource } from "./city/source";
+import type { Entry } from "./data";
+import { httpApi, type ApiTransport } from "./api";
 export interface CityRepository {
   list(): Promise<Entry[]>;
   createAd(
     input: Pick<Entry, "title" | "text" | "category" | "price">,
   ): Promise<Entry>;
 }
-const key = "novik24.ads.v1";
 export function readStored<T>(key: string, fallback: T): T {
   try {
     return JSON.parse(localStorage.getItem(key) || "null") ?? fallback;
@@ -14,36 +13,33 @@ export function readStored<T>(key: string, fallback: T): T {
     return fallback;
   }
 }
-export function createRepository(
-  citySource: CitySource = demoCitySource,
-): CityRepository {
+export function createRepository(api: ApiTransport = httpApi): CityRepository {
   return {
     async list() {
-      const ads = readStored<Entry[]>(key, []);
-      return [
-        ...(Array.isArray(ads)
-          ? ads.filter(
-              (x) => x && typeof x.title === "string" && x.section === "ads",
-            )
-          : []),
-        ...demo,
-        ...(await citySource.list()),
-      ];
+      const legacy = readStored<Entry[]>("novik24.ads.v1", []);
+      if (Array.isArray(legacy) && legacy.length) {
+        for (const entry of legacy) {
+          if (
+            entry &&
+            typeof entry.title === "string" &&
+            typeof entry.text === "string"
+          )
+            await api.request("/ads", {
+              legacyId: entry.id,
+              title: entry.title,
+              text: entry.text,
+              category: entry.category || "Вещи",
+              price: entry.price || "По договорённости",
+            });
+        }
+        try {
+          localStorage.removeItem("novik24.ads.v1");
+        } catch {}
+      }
+      return api.request<Entry[]>("/catalog");
     },
-    async createAd(input) {
-      const entry: Entry = {
-        ...input,
-        id: crypto.randomUUID(),
-        section: "ads",
-        author: "Вы",
-        meta: "Только что · Новоуральск",
-      };
-      const previous = readStored<Entry[]>(key, []);
-      localStorage.setItem(
-        key,
-        JSON.stringify([entry, ...(Array.isArray(previous) ? previous : [])]),
-      );
-      return entry;
+    createAd(input) {
+      return api.request<Entry>("/ads", input);
     },
   };
 }

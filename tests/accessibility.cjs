@@ -14,11 +14,20 @@ const { chromium } = require("playwright");
     "city/events",
     "search",
     "assistant",
+    "exchange",
+    "cafes",
+    "cart",
+    "bonus",
+    "pharmacy",
+    "appointments",
   ]) {
     await page.goto(
       (process.env.BASE_URL || "http://localhost:4180") + "/#" + route,
     );
     await page.locator(".hero h1, main h1").first().waitFor();
+    await page.waitForFunction(
+      () => !document.querySelector('main .empty[role="status"]'),
+    );
     await page.evaluate(async () => {
       await Promise.all(
         document.getAnimations().map((a) => a.finished.catch(() => {})),

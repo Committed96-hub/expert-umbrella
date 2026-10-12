@@ -8,6 +8,12 @@ const sections: Section[] = [
   "city",
   "search",
   "assistant",
+  "exchange",
+  "cafes",
+  "cart",
+  "bonus",
+  "pharmacy",
+  "appointments",
 ];
 export function resolveRoute(hash: string): {
   section: Section;
