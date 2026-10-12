@@ -1,9 +1,11 @@
+import { useCityContext } from "./CityProvider";
 import { ThemeToggle } from "./ThemeToggle";
 import { useEffect, useState } from "react";
 import { Cloud, Clock3, MapPin } from "lucide-react";
 import { useRemote } from "../commerce/useRemote";
 import type { CityWeather } from "../../shared/weather";
 export function CityContext() {
+  const city = useCityContext().data;
   const { data, error, retry } = useRemote<CityWeather>("/weather");
   const [now, setNow] = useState(Date.now());
   useEffect(() => {
@@ -13,6 +15,7 @@ export function CityContext() {
   return (
     <div className="city-context">
       <ThemeToggle />
+      {city?.links.community && <a href={city.links.community} target="_blank" rel="noopener noreferrer">Подслушано Новоуральск ↗</a>}
       <span>
         <MapPin size={15} />
         Новоуральск

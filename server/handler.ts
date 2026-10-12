@@ -50,6 +50,7 @@ export async function handleRequest(request: Request): Promise<Response> {
         return respond({
           city: "Новоуральск",
           timezone: "Asia/Yekaterinburg",
+          links: { community: "https://vk.com/public170182912" },
           serverTime: new Date().toISOString(),
           weather: { mode: "unavailable", description: "Погода загружается", source: "Open-Meteo", sourceUrl: "https://open-meteo.com/" },
           storage: { mode: "demo", persistent: !process.env.VERCEL },

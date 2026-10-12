@@ -2,6 +2,7 @@ import { createContext, useContext, type ReactNode } from "react";
 import { useRemote } from "../commerce/useRemote";
 import type { CityWeather } from "../../shared/weather";
 export type CityContextData = {
+  links: { community: string };
   city: string;
   timezone: string;
   serverTime: string;
