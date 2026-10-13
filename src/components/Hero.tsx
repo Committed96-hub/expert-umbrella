@@ -13,7 +13,13 @@ import {
   ArrowDown,
 } from "lucide-react";
 export type Shortcut =
-  "masters" | "deals" | "events" | "medical" | "cafes" | "lost" | "nearby";
+  | "masters"
+  | "deals"
+  | "events"
+  | "medical"
+  | "cafes"
+  | "lost"
+  | "nearby";
 export function Hero({
   onSearch,
   onShortcut,
@@ -34,7 +40,11 @@ export function Hero({
   ] as const;
   return (
     <section className="hero" aria-label="Добро пожаловать в Новик 24">
-      {photo && <div className="hero-panorama"><VerifiedPhoto photo={photo} priority /></div>}
+      {photo && (
+        <div className="hero-panorama">
+          <VerifiedPhoto photo={photo} priority />
+        </div>
+      )}
       <div className="hero-shade" />
       <div className="hero-content">
         <div className="hero-eyebrow">
@@ -53,6 +63,9 @@ export function Hero({
           <br />
           Всё, что рядом — теперь ближе.
         </p>
+        <a className="hero-photo-link" href="#photos">
+          Фотографии настоящего Новоуральска <ArrowUpRight size={16} />
+        </a>
         <form
           className="hero-search"
           onSubmit={(e) => {
@@ -100,9 +113,7 @@ export function Hero({
           </a>
         </div>
       </div>
-      <span className="panorama-credit">
-        Реальный Новоуральск · без ретуши
-      </span>
+      <span className="panorama-credit">Реальный Новоуральск · без ретуши</span>
     </section>
   );
 }

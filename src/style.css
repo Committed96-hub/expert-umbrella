@@ -2890,3 +2890,38 @@ h1 {
 .ticket-invalid { color: var(--gold); font-size: 20px; font-weight: 800; line-height: 1.5; }
 @media (max-width: 700px) { .real-panel { padding: 16px; } .real-grid { grid-template-columns: 1fr; } .real-card { padding: 16px; } .experience-card { padding: 16px; } .seat-row { gap: 3px; grid-template-columns: 13px repeat(8,minmax(0,1fr)); } .seat-row button { min-height: 32px; padding: 0; } .demo-ticket { padding: 20px; } }
 .choice-row > .primary { color: var(--tone-122039,#122039); }
+/* Photo presentation: decoration belongs to the UI; original photo pixels remain unchanged. */
+.verified-photo { border: 1px solid var(--line); border-radius: 18px; overflow: hidden; background: var(--surface); box-shadow: 0 18px 48px rgba(0,0,0,.14); }
+.photo-stage { position: relative; padding: 22px 16px 16px; background: radial-gradient(ellipse at 50% 0,rgba(137,166,208,.13),transparent 65%),var(--surface); }
+.verified-photo .photo-stage > img { aspect-ratio: 4/3; width: 100%; object-fit: contain; border-radius: 6px; background: transparent; filter: none; transform: none; }
+.photo-place-label { display: flex; align-items: center; gap: 6px; margin-bottom: 12px; font-size: 9px; letter-spacing: 2px; color: var(--muted); }
+.verified-photo figcaption { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 16px 18px; background: var(--surface); color: inherit; border-top: 1px solid var(--line); }
+.verified-photo figcaption > div { flex: 1 1 220px; display: grid; gap: 6px; }
+.verified-photo figcaption strong { font-size: 14px; line-height: 1.5; font-weight: 500; }
+.verified-photo figcaption span { color: var(--muted); font-size: 10px; }
+.verified-photo figcaption a { display: inline-flex; gap: 5px; align-items: center; color: var(--gold); font-size: 10px; min-height: 24px; }
+.photo-expand { position: absolute; right: 26px; bottom: 26px; background: #101c30; color: #edf1f8; border: 1px solid #c3d0e655; border-radius: 10px; padding: 10px; display: flex; gap: 8px; align-items: center; min-height: 40px; }
+.photo-loading { position: absolute; inset: 60px 15px 15px; display: grid; place-items: center; color: var(--muted); font-size: 12px; pointer-events: none; }
+.photo-unavailable { min-height: 220px; display: flex; flex-direction: column; justify-content: center; gap: 14px; padding: 25px; text-align: center; color: inherit; background: transparent; }
+.photo-unavailable b { font-size: 16px; font-weight: 500; }.photo-unavailable p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
+.photo-unavailable svg { color: var(--gold); }.photo-unavailable .secondary { font-size: 11px; }
+.section-photo { border: 0; box-shadow: none; background: none; }
+.section-photo .photo-placeholder { border: 1px solid var(--line); border-radius: 18px; padding: 24px; background: radial-gradient(ellipse at 100% 0,rgba(166,135,88,.1),transparent 65%),var(--surface); }
+.photo-placeholder > span { display: flex; align-items: center; gap: 8px; }.photo-placeholder > p { margin: 14px 0; }
+.photo-placeholder small,.photo-placeholder small a { color: var(--muted); }.photo-placeholder small a { text-decoration: underline; }
+.photo-gallery-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 22px; }
+.gallery-intro { margin: 10px 0 28px; max-width: 640px; }.gallery-intro > span { font-size: 10px; color: var(--gold); letter-spacing: 2px; }.gallery-intro h2 { font-size: 30px; line-height: 1.25; font-weight: 500; }.gallery-intro p,.gallery-note { color: var(--muted); font-size: 13px; line-height: 1.9; }.gallery-note { margin-top: 26px; }
+.photo-dialog { max-width: min(1100px,95vw); width: 95vw; max-height: 94dvh; padding: 22px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); color: inherit; overflow: auto; }
+.photo-dialog::backdrop { background: rgba(3,8,17,.88); }.photo-dialog img { display: block; width: 100%; max-height: 70dvh; object-fit: contain; filter: none; background: transparent; }.photo-dialog-close { margin: 0 0 16px auto; }.photo-dialog > p { font-size: 12px; }.photo-dialog > a { font-size: 12px; color: var(--gold); text-decoration: underline; }
+.hero > .hero-panorama { box-shadow: 0 30px 90px rgba(0,0,0,.2); border: 1px solid var(--line); }
+.hero > .hero-panorama .verified-photo { border: 0; border-radius: 20px; box-shadow: none; }.hero > .hero-panorama .photo-stage > img { aspect-ratio: 3/4; max-height: 560px; }
+[data-theme="light"] .verified-photo figcaption { background: var(--surface); color: inherit; }[data-theme="light"] .verified-photo figcaption a { color: var(--gold); }
+@media(max-width:700px) { .photo-gallery-grid { grid-template-columns:1fr; gap:18px; }.photo-stage { padding:18px 12px 12px; }.verified-photo figcaption { padding:14px; }.photo-dialog { padding:14px; }.hero > .hero-panorama .photo-stage > img { max-height:340px; }.photo-unavailable { min-height:190px; }.gallery-intro h2 { font-size:26px; } }
+.hero-photo-link { display:inline-flex; gap:8px; align-items:center; padding:10px 0; font-size:12px; color:var(--gold); text-decoration:underline; margin-bottom:14px; }
+.section-photo { --photo-accent: rgba(137,166,208,.14); }
+.section-photo-cafes,.section-photo-cart { --photo-accent: rgba(190,127,75,.2); }
+.section-photo-shops,.section-photo-malls { --photo-accent: rgba(126,139,188,.18); }
+.section-photo-jobs,.section-photo-exchange { --photo-accent: rgba(108,140,157,.18); }
+.section-photo-parks { --photo-accent: rgba(101,147,120,.18); }
+.section-photo-cinema { --photo-accent: rgba(188,158,108,.18); }
+.section-photo .photo-placeholder { background: radial-gradient(ellipse at 100% 0,var(--photo-accent),transparent 65%),var(--surface); }

@@ -5,6 +5,7 @@ import {
   PhotoProvider,
   SectionPhoto,
   PhotoSources,
+  PhotoGallery,
 } from "./components/CityPhotos";
 import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
@@ -50,6 +51,7 @@ import { CityProvider } from "./components/CityProvider";
 import { CityContext } from "./components/CityContext";
 import { resolveRoute } from "./routes";
 const nav = [
+  { id: "photos", label: "Фотографии города", Icon: MapPin },
   { id: "cinema", label: "Кино и DEMO-билет", Icon: CalendarDays },
   { id: "cars", label: "Автомобили", Icon: ShoppingBag },
   { id: "jobs", label: "Работа", Icon: BriefcaseBusiness },
@@ -71,6 +73,7 @@ const nav = [
   { id: "pharmacy", label: "Аптеки", Icon: Pill },
 ] as const;
 const titles: Record<Section, string> = {
+  photos: "Новоуральск в деталях",
   cinema: "Кино в Новоуральске",
   cars: "Автомобили наших жителей",
   jobs: "Работа в своём городе",
@@ -92,6 +95,7 @@ const titles: Record<Section, string> = {
   pharmacy: "Аптеки рядом",
 };
 const subtitles: Record<Section, string> = {
+  photos: "Настоящие места, оригинальные фотографии и открытые лицензии.",
   cinema: "Реальный киноцентр и отдельная учебная покупка билета.",
   cars: "Опубликованные характеристики и ссылки на оригинальные объявления.",
   jobs: "Опубликованные вакансии с источниками и учебным откликом.",
@@ -425,9 +429,11 @@ function App() {
           </div>
         </aside>
         <main>
-          <SectionPhoto
-            section={section === "city" ? `city/${cityKind}` : section}
-          />
+          {section !== "photos" && (
+            <SectionPhoto
+              section={section === "city" ? `city/${cityKind}` : section}
+            />
+          )}
           <div className="page-intro">
             <nav className="section-switcher" aria-label="Все разделы">
               {nav
@@ -537,6 +543,8 @@ function App() {
                 Повторить загрузку
               </button>
             </div>
+          ) : section === "photos" ? (
+            <PhotoGallery />
           ) : section === "cinema" ? (
             <Cinema />
           ) : [

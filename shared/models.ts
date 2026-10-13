@@ -1,4 +1,5 @@
 export type Section =
+  | "photos"
   | "cinema"
   | "cars"
   | "feed"

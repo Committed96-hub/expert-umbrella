@@ -142,3 +142,13 @@ CHROMIUM_PATH=/usr/bin/chromium BASE_URL=http://localhost:5173 npm run test:comm
 ```
 
 Для Vercel используется только ветка `preview/real-city-interactions`. Production и `main` не меняются до проверки пользователем.
+
+## Оформление фотографий и галерея
+
+Маршрут `#photos` — шесть лицензированных исторических снимков Новоуральска. Фото не ретушируются: оформление создают рамка, тени, подписи и цветовые акценты интерфейса. Просмотр оригинала использует нативный `<dialog>` с закрытием по Escape и возвратом фокуса. Есть loading/error/retry фотореестра и повтор загрузки отдельного снимка. Новые источники и ограничения перечислены в [PHOTO_SOURCES.md](PHOTO_SOURCES.md).
+
+```sh
+CHROMIUM_PATH=/usr/bin/chromium BASE_URL=http://localhost:5173 npm run test:photo-gallery
+```
+
+Проверка загрузки/увеличения в этом тесте использует сетевую фикстуру, а не настоящий оригинал. Проверка реальных Wikimedia JPEG в среде ограничена сетевой политикой. Ветка публикации — `preview/photo-presentation`; Production остаётся прежним.
