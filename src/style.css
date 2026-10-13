@@ -2913,10 +2913,8 @@ h1 {
 .gallery-intro { margin: 10px 0 28px; max-width: 640px; }.gallery-intro > span { font-size: 10px; color: var(--gold); letter-spacing: 2px; }.gallery-intro h2 { font-size: 30px; line-height: 1.25; font-weight: 500; }.gallery-intro p,.gallery-note { color: var(--muted); font-size: 13px; line-height: 1.9; }.gallery-note { margin-top: 26px; }
 .photo-dialog { max-width: min(1100px,95vw); width: 95vw; max-height: 94dvh; padding: 22px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); color: inherit; overflow: auto; }
 .photo-dialog::backdrop { background: rgba(3,8,17,.88); }.photo-dialog img { display: block; width: 100%; max-height: 70dvh; object-fit: contain; filter: none; background: transparent; }.photo-dialog-close { margin: 0 0 16px auto; }.photo-dialog > p { font-size: 12px; }.photo-dialog > a { font-size: 12px; color: var(--gold); text-decoration: underline; }
-.hero > .hero-panorama { box-shadow: 0 30px 90px rgba(0,0,0,.2); border: 1px solid var(--line); }
-.hero > .hero-panorama .verified-photo { border: 0; border-radius: 20px; box-shadow: none; }.hero > .hero-panorama .photo-stage > img { aspect-ratio: 3/4; max-height: 560px; }
 [data-theme="light"] .verified-photo figcaption { background: var(--surface); color: inherit; }[data-theme="light"] .verified-photo figcaption a { color: var(--gold); }
-@media(max-width:700px) { .photo-gallery-grid { grid-template-columns:1fr; gap:18px; }.photo-stage { padding:18px 12px 12px; }.verified-photo figcaption { padding:14px; }.photo-dialog { padding:14px; }.hero > .hero-panorama .photo-stage > img { max-height:340px; }.photo-unavailable { min-height:190px; }.gallery-intro h2 { font-size:26px; } }
+@media(max-width:700px) { .photo-gallery-grid { grid-template-columns:1fr; gap:18px; }.photo-stage { padding:18px 12px 12px; }.verified-photo figcaption { padding:14px; }.photo-dialog { padding:14px; }.photo-unavailable { min-height:190px; }.gallery-intro h2 { font-size:26px; } }
 .hero-photo-link { display:inline-flex; gap:8px; align-items:center; padding:10px 0; font-size:12px; color:var(--gold); text-decoration:underline; margin-bottom:14px; }
 .section-photo { --photo-accent: rgba(137,166,208,.14); }
 .section-photo-cafes,.section-photo-cart { --photo-accent: rgba(190,127,75,.2); }
@@ -2925,3 +2923,56 @@ h1 {
 .section-photo-parks { --photo-accent: rgba(101,147,120,.18); }
 .section-photo-cinema { --photo-accent: rgba(188,158,108,.18); }
 .section-photo .photo-placeholder { background: radial-gradient(ellipse at 100% 0,var(--photo-accent),transparent 65%),var(--surface); }
+
+/* Главный экран: подтверждённая фотография Новоуральска остаётся фоном в обеих темах. */
+.hero {
+  display: block;
+  padding: 0;
+}
+.hero > .hero-panorama {
+  position: absolute;
+  inset: 0;
+  z-index: -3;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 54%;
+  border: 0;
+  border-radius: 0;
+  opacity: 1;
+  filter: none;
+  transform: none;
+}
+.hero .hero-shade {
+  display: block;
+  background:
+    linear-gradient(90deg,rgba(4,12,24,.82),rgba(5,14,26,.54) 56%,rgba(7,19,35,.24)),
+    linear-gradient(0deg,rgba(8,15,29,.9) 0%,transparent 30%,rgba(5,14,28,.18) 82%);
+}
+.hero .hero-content {
+  width: auto;
+  max-width: 1336px;
+  margin: auto;
+  padding: 77px 28px 38px;
+  height: 100%;
+}
+.hero .panorama-credit {
+  display: block;
+}
+[data-theme="light"] .hero .hero-shade {
+  background:
+    linear-gradient(90deg,rgba(20,34,48,.7),rgba(24,39,52,.32) 56%,rgba(33,48,60,.08)),
+    linear-gradient(0deg,rgba(230,237,246,.48) 0%,transparent 28%,rgba(241,246,250,.08) 82%);
+}
+@media (max-width: 700px) {
+  .hero {
+    display: block;
+    padding: 0;
+  }
+  .hero .hero-content {
+    padding: 70px 18px 32px;
+  }
+  .hero > .hero-panorama {
+    object-position: center 50%;
+  }
+}

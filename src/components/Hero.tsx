@@ -1,4 +1,4 @@
-import { usePhoto, VerifiedPhoto } from "./CityPhotos";
+import { usePhoto } from "./CityPhotos";
 import { useState } from "react";
 import {
   Search,
@@ -41,9 +41,13 @@ export function Hero({
   return (
     <section className="hero" aria-label="Добро пожаловать в Новик 24">
       {photo && (
-        <div className="hero-panorama">
-          <VerifiedPhoto photo={photo} priority />
-        </div>
+        <img
+          className="hero-panorama"
+          src={photo.original}
+          alt={`${photo.object}, Новоуральск. Фото ${photo.author}`}
+          fetchPriority="high"
+          decoding="async"
+        />
       )}
       <div className="hero-shade" />
       <div className="hero-content">
